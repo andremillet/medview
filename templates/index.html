@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block title %}MedView Dashboard{% endblock %}
+
+{% block content %}
+<section class="file-upload">
+    <div class="upload-container">
+        <h2>Medical Data Dashboard</h2>
+        <p>Upload one or multiple .med files to analyze patient data</p>
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="drop-area" id="drop-area">
+                <input type="file" id="file-input" name="files" accept=".med" multiple hidden>
+                <div class="drop-message">
+                    <i class="fas fa-file-medical"></i>
+                    <p>Drag & drop your .med files here</p>
+                    <p>or</p>
+                    <button type="button" id="browse-button">Browse Files</button>
+                </div>
+                <div class="file-list" id="file-list"></div>
+            </div>
+            <div class="buttons">
+                <button type="submit" id="upload-button" disabled>Process Files</button>
+                <button type="button" id="sample-data">Use Sample Data</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="dashboard" id="dashboard">
+    <div class="summary-cards">
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-users"></i></div>
+            <div class="card-content">
+                <h3>Total Patients</h3>
+                <p id="total-patients">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card">
+            <h3>Age Distribution</h3>
+            <div class="chart-wrapper">
+                <canvas id="age-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <h3>Gender Distribution</h3>
+            <div class="chart-wrapper">
+                <canvas id="gender-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <h3>Top Diagnoses</h3>
+            <div class="chart-wrapper">
+                <canvas id="diagnoses-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <h3>Top Prescriptions</h3>
+            <div class="chart-wrapper">
+                <canvas id="prescriptions-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <h3>Top Exam Requests</h3>
+            <div class="chart-wrapper">
+                <canvas id="exams-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <h3>Top Referrals</h3>
+            <div class="chart-wrapper">
+                <canvas id="referrals-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card full-width">
+            <h3>Encounters Timeline</h3>
+            <div class="chart-wrapper">
+                <canvas id="timeline-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loader"></div>
+    <p>Processing data...</p>
+</div>
+{% endblock %}
