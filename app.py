@@ -17,6 +17,18 @@ def index():
     """Render the main dashboard page."""
     return render_template('index.html')
 
+@app.route('/check-api-status')
+def check_api_status():
+    """Check if the ROA API is reachable."""
+    try:
+        response = requests.get(app.config['ROA_API_URL'], timeout=5)
+        if response.status_code == 200:
+            return jsonify({'status': 'online', 'message': 'ROA API is online'})
+        else:
+            return jsonify({'status': 'error', 'message': f'ROA API returned status code {response.status_code}'})
+    except requests.RequestException as e:
+        return jsonify({'status': 'offline', 'message': f'ROA API is unreachable: {str(e)}'})
+
 @app.route('/upload', methods=['POST'])
 def upload_files():
     """Handle file uploads and process the data."""

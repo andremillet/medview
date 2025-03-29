@@ -54,6 +54,19 @@
         
         <div class="buttons center-buttons">
             <button type="button" id="sample-data">Use Sample Data</button>
+            <div class="dropdown">
+                <button type="button" id="roa-quick-import">
+                    Import from ROA <i class="fas fa-chevron-down"></i>
+                    <span class="api-status" id="api-status-indicator"></span>
+                </button>
+                <div class="dropdown-content">
+                    <div class="api-status-message" id="api-status-message">Checking connection...</div>
+                    <a href="#" data-period="day">Today's Records</a>
+                    <a href="#" data-period="month">This Month</a>
+                    <a href="#" data-period="3months">Last 3 Months</a>
+                    <a href="#" data-period="6months">Last 6 Months</a>
+                </div>
+            </div>
         </div>
     </div>
 </section>

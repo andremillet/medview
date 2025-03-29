@@ -258,6 +258,117 @@ button:disabled {
     background-color: var(--secondary-color);
 }
 
+#roa-quick-import {
+    background-color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#roa-quick-import i {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: var(--card-bg);
+    min-width: 180px;
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+    z-index: 1;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: var(--text-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    transition: var(--transition);
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+}
+
+.dark-theme .dropdown-content a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-content a.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.dropdown-content a.disabled:hover {
+    background-color: transparent;
+    color: var(--text-color);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.dropdown:hover #roa-quick-import i {
+    transform: rotate(180deg);
+}
+
+/* API Status Indicator */
+.api-status {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 8px;
+    background-color: #777; /* Default/unknown state */
+}
+
+.api-status.online {
+    background-color: #2ecc71; /* Green for online */
+}
+
+.api-status.offline {
+    background-color: #e74c3c; /* Red for offline */
+}
+
+.api-status.error {
+    background-color: #f39c12; /* Orange for error state */
+}
+
+.api-status-message {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: #777;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.api-status-message.online {
+    color: #2ecc71;
+}
+
+.api-status-message.offline {
+    color: #e74c3c;
+}
+
+.api-status-message.error {
+    color: #f39c12;
+}
+
 /* API form styling */
 .api-message {
     text-align: center;

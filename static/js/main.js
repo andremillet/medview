@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Check API status
+    checkAPIStatus();
     // DOM Elements
     const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('file-input');
@@ -12,6 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('theme-toggle');
     const apiForm = document.getElementById('api-form');
     const dataSourceCard = document.getElementById('data-source-card');
+    const roaQuickImport = document.getElementById('roa-quick-import');
+    const roaDropdownLinks = document.querySelectorAll('.dropdown-content a');
 
     // Tab elements
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -292,6 +296,66 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // ROA Quick Import dropdown
+    if (roaDropdownLinks && roaDropdownLinks.length) {
+        roaDropdownLinks.forEach(link => {
+            link.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const period = this.getAttribute('data-period');
+                loadingOverlay.style.display = 'flex';
+                
+                try {
+                    const response = await fetch('/fetch-api-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ period: period })
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Error fetching API data');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Display data source info
+                    if (dataSourceCard) {
+                        dataSourceCard.style.display = 'block';
+                        
+                        let sourceText;
+                        switch(period) {
+                            case 'day':
+                                sourceText = 'ROA API (Today)';
+                                break;
+                            case 'month':
+                                sourceText = 'ROA API (This Month)';
+                                break;
+                            case '3months':
+                                sourceText = 'ROA API (Last 3 Months)';
+                                break;
+                            case '6months':
+                                sourceText = 'ROA API (Last 6 Months)';
+                                break;
+                            default:
+                                sourceText = `ROA API (${period})`;
+                        }
+                        
+                        document.getElementById('data-source').textContent = sourceText;
+                    }
+                    
+                    displayAnalytics(data);
+                } catch (error) {
+                    showErrorNotification('Error: ' + error.message);
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            });
+        });
+    }
 
     // Display analytics
     function displayAnalytics(data) {
@@ -452,5 +516,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 notification.parentNode.removeChild(notification);
             }
         }, 300);
+    }
+    
+    // Check ROA API status
+    function checkAPIStatus() {
+        const statusIndicator = document.getElementById('api-status-indicator');
+        const statusMessage = document.getElementById('api-status-message');
+        
+        if (!statusIndicator || !statusMessage) return;
+        
+        fetch('/check-api-status')
+            .then(response => response.json())
+            .then(data => {
+                // Update status indicator color
+                statusIndicator.className = 'api-status ' + data.status;
+                
+                // Update status message
+                statusMessage.textContent = data.message;
+                statusMessage.className = 'api-status-message ' + data.status;
+                
+                // If API is offline, disable dropdown links
+                if (data.status === 'offline') {
+                    document.querySelectorAll('.dropdown-content a').forEach(link => {
+                        link.classList.add('disabled');
+                        link.addEventListener('click', e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            showErrorNotification('ROA API is currently unavailable');
+                        }, { capture: true });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error checking API status:', error);
+                statusIndicator.className = 'api-status error';
+                statusMessage.textContent = 'Error checking API status';
+                statusMessage.className = 'api-status-message error';
+            });
     }
 });
