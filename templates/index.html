@@ -6,23 +6,55 @@
 <section class="file-upload">
     <div class="upload-container">
         <h2>Medical Data Dashboard</h2>
-        <p>Upload one or multiple .med files to analyze patient data</p>
-        <form id="upload-form" enctype="multipart/form-data">
-            <div class="drop-area" id="drop-area">
-                <input type="file" id="file-input" name="files" accept=".med" multiple hidden>
-                <div class="drop-message">
-                    <i class="fas fa-file-medical"></i>
-                    <p>Drag & drop your .med files here</p>
-                    <p>or</p>
-                    <button type="button" id="browse-button">Browse Files</button>
+        <p>Upload files or fetch from ROA API to analyze patient data</p>
+        
+        <div class="tabs">
+            <button class="tab-button active" id="tab-upload">Upload .med Files</button>
+            <button class="tab-button" id="tab-api">Connect to ROA API</button>
+        </div>
+        
+        <div class="tab-content active" id="content-upload">
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="drop-area" id="drop-area">
+                    <input type="file" id="file-input" name="files" accept=".med" multiple hidden>
+                    <div class="drop-message">
+                        <i class="fas fa-file-medical"></i>
+                        <p>Drag & drop your .med files here</p>
+                        <p>or</p>
+                        <button type="button" id="browse-button">Browse Files</button>
+                    </div>
+                    <div class="file-list" id="file-list"></div>
                 </div>
-                <div class="file-list" id="file-list"></div>
-            </div>
-            <div class="buttons">
-                <button type="submit" id="upload-button" disabled>Process Files</button>
-                <button type="button" id="sample-data">Use Sample Data</button>
-            </div>
-        </form>
+                <div class="buttons">
+                    <button type="submit" id="upload-button" disabled>Process Files</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="tab-content" id="content-api">
+            <form id="api-form">
+                <div class="api-message">
+                    <i class="fas fa-server"></i>
+                    <p>Fetch patient data from ROA Neurology System</p>
+                    <p>Select time period:</p>
+                </div>
+                <div class="period-selector">
+                    <select id="api-period">
+                        <option value="day">Today (Last 24 hours)</option>
+                        <option value="month">Current Month</option>
+                        <option value="3months">Last 3 Months</option>
+                        <option value="6months">Last 6 Months</option>
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button type="submit" id="api-fetch-button">Fetch Data</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="buttons center-buttons">
+            <button type="button" id="sample-data">Use Sample Data</button>
+        </div>
     </div>
 </section>
 
@@ -33,6 +65,13 @@
             <div class="card-content">
                 <h3>Total Patients</h3>
                 <p id="total-patients">0</p>
+            </div>
+        </div>
+        <div class="card" id="data-source-card" style="display: none;">
+            <div class="card-icon"><i class="fas fa-database"></i></div>
+            <div class="card-content">
+                <h3>Data Source</h3>
+                <p id="data-source">-</p>
             </div>
         </div>
     </div>
@@ -93,4 +132,75 @@
     <div class="loader"></div>
     <p>Processing data...</p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab handling
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            const contentId = 'content-' + button.id.split('-')[1];
+            document.getElementById(contentId).classList.add('active');
+        });
+    });
+    
+    // API form submission
+    const apiForm = document.getElementById('api-form');
+    apiForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const period = document.getElementById('api-period').value;
+        const loadingOverlay = document.getElementById('loading-overlay');
+        
+        loadingOverlay.style.display = 'flex';
+        
+        fetch('/fetch-api-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ period: period })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(data => {
+            loadingOverlay.style.display = 'none';
+            renderDashboard(data);
+            
+            // Show data source info
+            document.getElementById('data-source-card').style.display = 'block';
+            
+            let sourceText = `ROA API (${period})`;
+            if (period === 'day') sourceText = 'ROA API (Today)';
+            else if (period === 'month') sourceText = 'ROA API (This Month)';
+            else if (period === '3months') sourceText = 'ROA API (Last 3 Months)';
+            else if (period === '6months') sourceText = 'ROA API (Last 6 Months)';
+            
+            document.getElementById('data-source').textContent = sourceText;
+            
+            // Scroll to dashboard
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+            loadingOverlay.style.display = 'none';
+            alert('Error fetching data: ' + (error.error || 'Unknown error'));
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
 {% endblock %}

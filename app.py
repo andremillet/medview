@@ -1,5 +1,7 @@
 import os
 import json
+import requests
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
 from utils.analytics import process_med_files, get_analytics
@@ -7,6 +9,7 @@ from utils.analytics import process_med_files, get_analytics
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp/medview_uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
+app.config['ROA_API_URL'] = 'https://roa-mrsz.onrender.com/api/medfiles'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/')
@@ -51,6 +54,47 @@ def upload_files():
         for file_path in file_paths:
             if os.path.exists(file_path):
                 os.remove(file_path)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/fetch-api-data', methods=['POST'])
+def fetch_api_data():
+    """Fetch medical data from the ROA API."""
+    try:
+        period = request.json.get('period', 'day')
+        valid_periods = ['day', 'month', '3months', '6months']
+        
+        if period not in valid_periods:
+            return jsonify({'error': f'Invalid period. Choose from: {", ".join(valid_periods)}'}), 400
+            
+        # Make request to the ROA API
+        api_url = f"{app.config['ROA_API_URL']}?period={period}"
+        response = requests.get(api_url, timeout=10)
+        
+        if response.status_code != 200:
+            return jsonify({'error': f'API returned status code {response.status_code}'}), 500
+            
+        # Extract just the content from each file for processing
+        med_files_data = response.json()
+        patient_data = [file['content'] for file in med_files_data]
+        
+        if not patient_data:
+            return jsonify({'error': 'No data found for selected period'}), 404
+            
+        # Process the data using the existing analytics function
+        analytics = get_analytics(patient_data)
+        
+        # Add metadata about the source
+        analytics['metadata'] = {
+            'source': 'roa-api',
+            'period': period,
+            'file_count': len(patient_data),
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify(analytics)
+    except requests.RequestException as e:
+        return jsonify({'error': f'Failed to connect to ROA API: {str(e)}'}), 503
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/sample', methods=['GET'])

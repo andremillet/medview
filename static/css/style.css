@@ -89,6 +89,54 @@ footer {
     margin-top: 2rem;
 }
 
+/* Tabs styling */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    font-weight: 500;
+    opacity: 0.7;
+    transition: var(--transition);
+    color: var(--text-color);
+}
+
+.tab-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-theme .tab-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-button.active {
+    opacity: 1;
+    border-bottom: 3px solid var(--primary-color);
+    font-weight: 600;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* File Upload Section */
 .file-upload {
     margin-bottom: 2rem;
@@ -210,6 +258,68 @@ button:disabled {
     background-color: var(--secondary-color);
 }
 
+/* API form styling */
+.api-message {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.api-message i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.period-selector {
+    margin: 20px auto;
+    max-width: 300px;
+}
+
+.period-selector select {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 0.65rem auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+}
+
+.period-selector select:hover {
+    border-color: var(--primary-color);
+}
+
+.period-selector select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(70, 130, 180, 0.2);
+    outline: none;
+}
+
+.dark-theme .period-selector select {
+    background-color: #2a2a2a;
+    border-color: #444;
+}
+
+.dark-theme .period-selector select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(79, 163, 224, 0.3);
+}
+
+/* Center buttons */
+.center-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
 /* Dashboard Section */
 .dashboard {
     display: none;
@@ -250,6 +360,17 @@ button:disabled {
     color: var(--primary-color);
 }
 
+/* Data source card styling */
+#data-source-card {
+    background-color: var(--card-bg);
+    border-left: 4px solid var(--primary-color);
+}
+
+.dark-theme #data-source-card {
+    background-color: var(--card-bg);
+    border-left-color: var(--primary-color);
+}
+
 .charts-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -276,6 +397,56 @@ button:disabled {
 
 .full-width {
     grid-column: 1 / -1;
+}
+
+/* Error Notification */
+.error-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #f44336;
+    color: white;
+    padding: 15px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    max-width: 400px;
+    transform: translateX(110%);
+    transition: transform 0.3s ease;
+}
+
+.error-notification.show {
+    transform: translateX(0);
+}
+
+.error-notification.hide {
+    transform: translateX(110%);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+}
+
+.notification-content i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.close-notification {
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.close-notification:hover {
+    transform: scale(1.1);
 }
 
 /* Loading Overlay */
@@ -326,5 +497,16 @@ button:disabled {
     
     .buttons {
         flex-direction: column;
+    }
+    
+    .tabs {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tab-button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 5px;
     }
 }
