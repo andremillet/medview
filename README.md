@@ -152,9 +152,6 @@ medview/
 - Files are temporarily stored during processing and then removed
 - No patient identifiable information is stored permanently
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
